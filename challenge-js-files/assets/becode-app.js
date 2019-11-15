@@ -16,7 +16,7 @@ div.setAttribute("id", "table");
 h1.after(div);
 let margin = {top: 10, right: 30, bottom: 30, left: 60};
 let width = 800 - margin.left - margin.right;
-let height = 300 - margin.top - margin.bottom;
+let height = 400 - margin.top - margin.bottom;
 
 let svg = d3.select(div)
   .append("svg")
@@ -24,18 +24,18 @@ let svg = d3.select(div)
     .attr("height", height + margin.top + margin.bottom)
     .style("background", "#C5FFEA")
   .append("g")
+    .attr("id", "svg")
     .attr("transform",
           "translate(" + margin.left + "," + margin.top + ")");
-
-
-          
+  
 const api = "https://inside.becode.org/api/v1/data/random.json";
-let arrObj = [];
-let keys = [];
-let values = [];
-let data = [];
 
-function getData(){
+function getData() {
+    let arrObj = [];
+    let keys = [];
+    let values = [];
+    const svgEl = document.querySelector('#svg');
+        svgEl.innerHTML = "";
     fetch(api)
         .then(function (data) {
             return data.json()
@@ -51,12 +51,12 @@ function getData(){
         })
         .then(function draw (){
             let  x = d3.scaleLinear()
-                                    .domain([0, d3.max(keys)])
-                                    .range([ 0, width]);
+                      .domain([0, 10])
+                      .range([ 0, width]);
             svg.append("g")
-                            .attr("transform", "translate(0," + height/2 + ")")
-                            .call(d3.axisBottom(x));
-  
+              .attr("transform", "translate(0," + height/2 + ")")
+              .call(d3.axisBottom(x));
+            
             let y = d3.scaleLinear()
             .domain([-20, 20])
             .range([ height, 0 ]);
@@ -66,20 +66,20 @@ function getData(){
             svg.append("path")
                 .datum(arrObj)
                 .attr("fill", "none")
+                .attr("id", "path")
                 .attr("stroke", "steelblue")
                 .attr("stroke-width", 1.5)
                 .attr("d", d3.line()
                                     .x(function(d) { return x(d.par1) })
                                     .y(function(d) { return y(d.par2) })
             );
-        }); // function draw
-   
+        })
     setTimeout(() => {
-    // getData();
-    // document.querySelector("path").exit().remove()
+    getData();
     }, 1000);
 } // fn getData();
 getData();
+
 
 // Table 1
 const table_1 = document.getElementById('table1');
@@ -87,6 +87,7 @@ const arrTab_1 = [];
 const arr = [];
 const years = [];
 const pays = [];
+const data = []
 const tr = document.getElementById('table1').querySelectorAll("tr");
 const td = document.getElementById('table1').querySelectorAll("td");
 const th = document.getElementById('table1').querySelectorAll("th");
@@ -96,15 +97,19 @@ for(i = 0; i < td.length; i++){
 } 
 for(let i = 0; i < arr.length; i+=12){
     arrTab_1.push(arr.slice(i, i+12))
-    pays.push(arr[i]);
+    let country = arr[i].split("(");
+    pays.push(country[0]);
 }
 for(i = 0; i < th.length; i++){
     let regExp = /^[0-9]/ 
     if (regExp.test(th[i].innerHTML) == true){
-        let date = new Date(th[i].innerHTML)
-        let formatTime = d3.timeFormat("%Y")
-        formatTime(date);   
-        years.push(formatTime)
+        years.push(th[i].innerHTML);
+    }
+}
+for (i = 0; i < arr.length; i++){
+    let regExp = /^[a-zA-Z]/ 
+    if (regExp.test(arr[i]) == false){
+        data.push(parseFloat(arr[i]));
     }
 }
 
@@ -115,19 +120,21 @@ table1.before(div_2);
 
 //Buttons
 for (i = 2; i < years.length +2; i++){
-    let button = document.createElement("button");
+   let button = document.createElement("button");
     button.setAttribute("id", "button"+i);
     button.setAttribute("style", "height:40px;width:60px;margin:5px;background:#48A8EB;font-weight:bold");
-    button.innerHTML = "200"+i;
+    if (i < 10) {
+        button.innerHTML = "200"+i;
+    } else {button.innerHTML = "20"+i;}
     div_2.appendChild(button);
 }
 
-// [...buttons].map(button => {
-//     button.addEventListener("click", e =>{
-//         e.preventDefault();
-        
-//     });
-// });
+//Year
+let h3 = document.createElement("h3");
+h3.setAttribute("id", "h3");
+h3.innerHTML = "Sélectionnez l'année, s'il vous plaît"
+let lastbutton = document.getElementById("button"+(years.length+1));
+lastbutton.after(h3);
 
 //svg
 let graphe = d3.select(div_2)
@@ -139,54 +146,35 @@ let graphe = d3.select(div_2)
     .attr("transform",
           "translate(" + margin.left + "," + margin.top + ")");
 
-
 // Axes: 
-let  x_axis = d3.scaleTime()
+let  x_axis = d3.scaleBand()
     .domain(pays)
-    .range([ 0, width]);
+    .range([ 0, width])
+    .paddingInner([0.1])
+	.paddingOuter([0.3])
+    .align([0.5])
     graphe.append("g")
-        .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(x_axis));
-  
-let y_axis = d3.scaleLinear()
-    .domain([d3.min(years), d3.max(years)])
-    .range([ height, 0]);
+        .attr("transform", "translate(0," + (height - 90) + ")")
+        .call(d3.axisBottom(x_axis))
+            .selectAll("text")  
+            .style("text-anchor", "end")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .attr("transform", "rotate(-65)" );
+    
+let y_axis = d3.scaleOrdinal()
+    .domain([d3.min(data), d3.max(data)])
+    .range([ (height-90), 0]);
     graphe.append("g")
     .call(d3.axisLeft(y_axis));
 
-    console.log(years)
-// let y_axis = d3.axisLeft()
-// .scale(yScale);
+//Change data
+const buttons = document.querySelectorAll("button");
+[...buttons].map(button => {
+    button.addEventListener("click", e =>{
+        e.preventDefault();
+        e.target.setAttribute('background', 'blue');
+        h3.innerHTML = button.innerHTML;
 
-// let x_axis = d3.axisBottom()
-// .scale(xScale);
-
-// graphe.append("g")
-// .attr("transform", "translate(50,10)")
-// .call(y_axis);
-
-// let xAxisTranslate = height - 20;
-
-// graphe.append("g")
-// .attr("tranform", "translate(50, 3 + xAxisTranslate + ")");
-// .call(x_axis);
-
-//barChat
-// let barWidth = (width/arrTab_1.length);
-// let barPadding = 5;
-
-// let barChat = graphe.selectAll("rect")
-// .data(arrTab_1)
-// .enter()
-// .append("rect")
-// .attr("y", function(d){
-//     return height - d
-// })
-// .attr("width", barWidth - barPadding)
-// .attr("transform", function(d, i){
-//     let translate = [barWidth + i, 0];
-//     return "translate("+ translate + ")";
-// });
-
-// console.log(arrTab_1);
-// console.log(years);
+    });
+});
