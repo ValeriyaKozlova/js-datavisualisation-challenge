@@ -96,7 +96,6 @@ for(i = 0; i < td.length; i++){
     arr.push(td[i].innerHTML)
 } 
 for(let i = 0; i < arr.length; i+=12){
-    arrTab_1.push(arr.slice(i, i+12))
     let country = arr[i].split("(");
     pays.push(country[0]);
 }
@@ -109,8 +108,14 @@ for(i = 0; i < th.length; i++){
 for (i = 0; i < arr.length; i++){
     let regExp = /^[a-zA-Z]/ 
     if (regExp.test(arr[i]) == false){
-        data.push(parseFloat(arr[i]));
+        let d = arr[i].replace(",", ".");
+        let dat = d.replace(":", "0");
+        data.push(parseFloat(dat));
     }
+}
+
+for(let i = 0; i < data.length; i+=11){
+    arrTab_1.push(data.slice(i, i+11))
 }
 
 let div_2 = document.createElement("div");
@@ -121,7 +126,7 @@ table1.before(div_2);
 //Buttons
 for (i = 2; i < years.length +2; i++){
    let button = document.createElement("button");
-    button.setAttribute("id", "button"+i);
+    button.setAttribute("id", i);
     button.setAttribute("style", "height:40px;width:60px;margin:5px;background:#48A8EB;font-weight:bold");
     if (i < 10) {
         button.innerHTML = "200"+i;
@@ -133,7 +138,7 @@ for (i = 2; i < years.length +2; i++){
 let h3 = document.createElement("h3");
 h3.setAttribute("id", "h3");
 h3.innerHTML = "Sélectionnez l'année, s'il vous plaît"
-let lastbutton = document.getElementById("button"+(years.length+1));
+let lastbutton = document.getElementById(years.length+1);
 lastbutton.after(h3);
 
 //svg
@@ -172,9 +177,34 @@ let y_axis = d3.scaleOrdinal()
 const buttons = document.querySelectorAll("button");
 [...buttons].map(button => {
     button.addEventListener("click", e =>{
-        e.preventDefault();
-        e.target.setAttribute('background', 'blue');
         h3.innerHTML = button.innerHTML;
-
+        let barPadding = 5;
+        let ind = button.id - 2;
+        let d = [];
+        for (i = 0; i < arrTab_1.length; i++){
+            d.push(arrTab_1[i][ind])
+        }
+        let barWidth = (width/d.length);
+         graphe.selectAll("bar")
+        .data(d)
+        .enter().append("rect")
+        .style("fill", "steelblue")
+        .attr("x", function(d) { return x(d); })
+        .attr("width", x.rangeBand())
+        .attr("y", function(d) { return y(d.value); })
+        .attr("height", function(d) {return height - d });
+        // let barChat = graphe.selectAll("rect")
+        // .data(d)
+        // .enter()
+        // .append("rect")
+        // .attr("fill", "blue")
+        // .attr("y", function(d){
+        //     return height - d
+        // })
+        // .attr("width", barWidth - barPadding)
+        // .attr("transform", function(d, i){
+        //     let translate = [barWidth + i, 0];
+        //     return "translate("+ translate + ")";
+        // }) 
     });
 });
