@@ -127,7 +127,7 @@ table1.before(div_2);
 for (i = 2; i < years.length +2; i++){
    let button = document.createElement("button");
     button.setAttribute("id", i);
-    button.setAttribute("style", "height:40px;width:60px;margin:5px;background:#48A8EB;font-weight:bold");
+    button.setAttribute("style", "height:40px;width:60px;margin:5px;background:#48A8EB;font-weight:bold; color:white");
     if (i < 10) {
         button.innerHTML = "200"+i;
     } else {button.innerHTML = "20"+i;}
@@ -149,62 +149,212 @@ let graphe = d3.select(div_2)
     .style("background", "#C5FFEA")
   .append("g")
     .attr("transform",
-          "translate(" + margin.left + "," + margin.top + ")");
+          "translate(" + margin.left + "," + margin.top + ")")
+    // .attr("id", "svg-chart");
 
 // Axes: 
 let  x_axis = d3.scaleBand()
     .domain(pays)
-    .range([ 0, width])
+    .rangeRound([ 0, width], .05)
     .paddingInner([0.1])
 	.paddingOuter([0.3])
-    .align([0.5])
-    graphe.append("g")
-        .attr("transform", "translate(0," + (height - 90) + ")")
-        .call(d3.axisBottom(x_axis))
-            .selectAll("text")  
-            .style("text-anchor", "end")
-            .attr("dx", "-.8em")
-            .attr("dy", ".15em")
-            .attr("transform", "rotate(-65)" );
+    .align([0.5]);
+graphe.append("g")
+    .attr("transform", "translate(0," + (height - 90) + ")")
+    .call(d3.axisBottom(x_axis))
+        .selectAll("text")  
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .attr("transform", "rotate(-65)" );
     
 let y_axis = d3.scaleOrdinal()
     .domain([d3.min(data), d3.max(data)])
     .range([ (height-90), 0]);
-    graphe.append("g")
-    .call(d3.axisLeft(y_axis));
+graphe.append("g")
+.call(d3.axisLeft(y_axis));
+
+
+const grapheChart = graphe.append("g")
+.attr("id", "svg-chart");
+
 
 //Change data
-const buttons = document.querySelectorAll("button");
+const buttons = document.getElementById("table_1").querySelectorAll("button");
 [...buttons].map(button => {
     button.addEventListener("click", e =>{
         h3.innerHTML = button.innerHTML;
         let barPadding = 5;
         let ind = button.id - 2;
         let d = [];
-        for (i = 0; i < arrTab_1.length; i++){
+        document.getElementById('svg-chart').innerHTML = "";
+        for (let i = 0; i < arrTab_1.length; i++){
             d.push(arrTab_1[i][ind])
         }
         let barWidth = (width/d.length);
-         graphe.selectAll("bar")
-        .data(d)
-        .enter().append("rect")
-        .style("fill", "steelblue")
-        .attr("x", function(d) { return x(d); })
-        .attr("width", x.rangeBand())
-        .attr("y", function(d) { return y(d.value); })
-        .attr("height", function(d) {return height - d });
-        // let barChat = graphe.selectAll("rect")
-        // .data(d)
-        // .enter()
-        // .append("rect")
-        // .attr("fill", "blue")
-        // .attr("y", function(d){
-        //     return height - d
-        // })
-        // .attr("width", barWidth - barPadding)
-        // .attr("transform", function(d, i){
-        //     let translate = [barWidth + i, 0];
-        //     return "translate("+ translate + ")";
-        // }) 
+console.log(d)
+
+grapheChart.selectAll("bar")
+.data(d)
+.enter().append("rect")
+.style("fill", "steelblue")
+.attr("transform", function(d, i) {
+        let translate = [barWidth * i, 0];
+        return "translate(" + translate + ")";
+    })
+.attr("width", width/d.length - barPadding)
+.attr("y", function(d) {
+    // console.log(y_axis(d.value));
+    // console.log(height);
+    return y_axis(d.value) - d/d3.max(data)*y_axis(d.value); })
+.attr("height", function(d) {
+    console.log(d3.max(data)*100);
+    console.log(d);
+    return d/d3.max(data)*y_axis(d.value); });
+
+
+    });
+});
+//Table 2
+const table_2 = document.getElementById('table2');
+const arrTab_2 = [];
+const arr_2 = [];
+const data_2 = [];
+let d_2 = [];
+let years_2 = [];
+let arrObj_2 = [];
+const td_2 = document.getElementById('table2').querySelectorAll("td");
+const th_2 = document.getElementById('table2').querySelectorAll("th");
+
+//Get data
+for(i = 0; i < td_2.length; i++){
+    arr_2.push(td_2[i].innerHTML)
+}
+for(i = 0; i < th_2.length; i++){
+    d_2.push(th_2[i].innerHTML)
+}
+for(i = 0; i < d_2.length; i++){
+    let regExp = /^[0-9-]/ 
+    if(regExp.test(d_2[i]) == true){
+        years_2.push((d_2[i]))
+    }
+}
+for (let i = 0; i < arr_2.length; i++){
+    let regExp = /^[a-zA-Z]/ 
+    if (regExp.test(arr_2) == true){
+       let x = arr_2[i].split("(");
+        data_2.push(x[0]);
+    } else {
+        data_2.push(arr_2[i]);
+    }
+}
+data_2.map((element, index) => {
+    if (element.includes("Angleterre")){
+       data_2[index] = "Angleterre et pays de Galles";
+    } 
+    if (element.includes("IrlandeduNord")){
+        data_2[index] = "Irlande du Nord";
+    }
+})
+for (i = 0; i < data_2.length; i+=3){
+   arrTab_2.push(data_2.slice(i, i+3));
+   arrTab_2.sort();
+}
+
+//Change HTML
+let div_3 = document.createElement("div");
+div_3.setAttribute("id", "table_2");
+table2.before(div_3);
+
+// //Buttons
+for (i = 0; i < arrTab_2.length; i++){
+   let button_2 = document.createElement("button");
+    button_2.setAttribute("id", i);
+    button_2.setAttribute("style", "width:auto;margin:5px;padding:5px 15px;background:#48A8EB;font-weight:bold;color:white");
+    button_2.innerHTML = arrTab_2[i][0];
+    div_3.appendChild(button_2);
+}
+
+let area = d3.select(div_3)
+.append("svg")
+.attr("id", "area")
+.attr("width", width + margin.left + margin.right)
+.attr("height", height + margin.top + margin.bottom)
+.style("background", "#C5FFEA")
+    radius = Math.min(width, height) / 2,
+    g = area.append("g").attr("transform", "translate(" + width / 2 + "," + height / 1.83 + ")").attr("padding-top", 10)
+
+let color = d3.scaleOrdinal(['#4daf4a','#377eb8']);
+
+// Generate the pie
+let pie = d3.pie();
+
+//legend
+let legend = area.selectAll(".legend")
+.data(pie(years_2))
+.enter().append("g")
+.attr("transform", function(d,i){
+return "translate(" + (width - 110) + "," + (i * 15 + 20) + ")";
+})
+.attr("class", "legend");   
+
+legend.append("rect")
+.attr("width", 20)
+.attr("height", 20)
+.attr("fill", function(d, i) {
+return color(i);
+});
+
+legend.append("text")
+.text(function(d){
+    return d.data;
+   })
+//   .text(years_2)
+.style("font-size", 20)
+.attr("y", 15)
+.attr("x", 25);
+
+let h3_2 = document.createElement("h3");
+h3_2.setAttribute("id", "h3_2");
+h3_2.innerHTML = "Sélectionnez le pays, s'il vous plaît"
+let lb_2 = document.getElementById("area");
+lb_2.before(h3_2);
+
+const buttons_country = document.getElementById("table_2").querySelectorAll("button");
+[...buttons_country].map(button => {
+    button.addEventListener("click", e =>{
+        h3_2.innerHTML = button.innerHTML + ", population carcérale, moyenne par an, (pour 100 000 habitants)";
+        let d = [];
+        let i = button.id;
+        d.push(arrTab_2[i][1])
+        d.push(arrTab_2[i][2])
+
+// Generate the arcs
+    let arc = d3.arc()
+                .innerRadius(0)
+                .outerRadius(radius);
+
+//Generate groups
+    let arcs = g.selectAll("arc")
+                .data(pie(d))
+                .enter()
+                .append("g")
+                .attr("class", "arc")
+
+//Draw arc paths
+    arcs.append("path")
+        .attr("fill", function(d, i) {
+            return color(i);
+        })
+        .attr("d", arc);
+
+    let labelArc = d3.arc()
+        .outerRadius(radius - 60)
+        .innerRadius(radius - 100);
+
+    arcs.append("text")
+        .attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ")"; })
+        .text(function(d){return d.value})
+        .style("fill", "#fff");
     });
 });
