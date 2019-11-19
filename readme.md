@@ -1,4 +1,4 @@
-js-datavisualisation-challenge
+# js-datavisualisation-challenge
 You can visit my version of data visualisation challenge here https://valeriyakozlova.github.io/js-datavisualisation-challenge/
 
 # What is it?
