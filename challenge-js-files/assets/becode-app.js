@@ -1,10 +1,10 @@
 /* 
 // WRITE YOUR JAVASCRIPT BELOW THIS COMMENT 
-Your name :     
-Date :  
-Contact information : 
+Your name : Valeriya    
+Date :  17.11.2019
+Contact information : https://github.com/ValeriyaKozlova
 What does this script do ? 
-...
+It vizualizes data
 */
 
 // Your scripting goes here...
@@ -94,17 +94,17 @@ const th = document.getElementById('table1').querySelectorAll("th");
 
 for(i = 0; i < td.length; i++){
     arr.push(td[i].innerHTML)
-} 
+};
 for(let i = 0; i < arr.length; i+=12){
     let country = arr[i].split("(");
     pays.push(country[0]);
-}
+};
 for(i = 0; i < th.length; i++){
     let regExp = /^[0-9]/ 
     if (regExp.test(th[i].innerHTML) == true){
         years.push(th[i].innerHTML);
     }
-}
+};
 for (i = 0; i < arr.length; i++){
     let regExp = /^[a-zA-Z]/ 
     if (regExp.test(arr[i]) == false){
@@ -112,11 +112,10 @@ for (i = 0; i < arr.length; i++){
         let dat = d.replace(":", "0");
         data.push(parseFloat(dat));
     }
-}
-
+};
 for(let i = 0; i < data.length; i+=11){
     arrTab_1.push(data.slice(i, i+11))
-}
+};
 
 let div_2 = document.createElement("div");
 let table1 = document.getElementById("table1");
@@ -132,7 +131,7 @@ for (i = 2; i < years.length +2; i++){
         button.innerHTML = "200"+i;
     } else {button.innerHTML = "20"+i;}
     div_2.appendChild(button);
-}
+};
 
 //Year
 let h3 = document.createElement("h3");
@@ -150,7 +149,6 @@ let graphe = d3.select(div_2)
   .append("g")
     .attr("transform",
           "translate(" + margin.left + "," + margin.top + ")")
-    // .attr("id", "svg-chart");
 
 // Axes: 
 let  x_axis = d3.scaleBand()
@@ -174,10 +172,8 @@ let y_axis = d3.scaleOrdinal()
 graphe.append("g")
 .call(d3.axisLeft(y_axis));
 
-
 const grapheChart = graphe.append("g")
 .attr("id", "svg-chart");
-
 
 //Change data
 const buttons = document.getElementById("table_1").querySelectorAll("button");
@@ -192,7 +188,6 @@ const buttons = document.getElementById("table_1").querySelectorAll("button");
             d.push(arrTab_1[i][ind])
         }
         let barWidth = (width/d.length);
-console.log(d)
 
 grapheChart.selectAll("bar")
 .data(d)
@@ -208,13 +203,10 @@ grapheChart.selectAll("bar")
     // console.log(height);
     return y_axis(d.value) - d/d3.max(data)*y_axis(d.value); })
 .attr("height", function(d) {
-    console.log(d3.max(data)*100);
-    console.log(d);
     return d/d3.max(data)*y_axis(d.value); });
-
-
     });
 });
+
 //Table 2
 const table_2 = document.getElementById('table2');
 const arrTab_2 = [];
@@ -273,7 +265,7 @@ for (i = 0; i < arrTab_2.length; i++){
     button_2.setAttribute("style", "width:auto;margin:5px;padding:5px 15px;background:#48A8EB;font-weight:bold;color:white");
     button_2.innerHTML = arrTab_2[i][0];
     div_3.appendChild(button_2);
-}
+};
 
 let area = d3.select(div_3)
 .append("svg")
