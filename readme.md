@@ -1,11 +1,11 @@
 js-datavisualisation-challenge
-You can visit my version of data visualisation challenge here
+You can visit my version of data visualisation challenge here https://valeriyakozlova.github.io/js-datavisualisation-challenge/
 
-#What is it?
+# What is it?
 It's my first attempt to work with D3.JS.
 I think, that this library useful, but not really easy to understand. I had a lot of problems with it, therefore I am not really glad of my result.
 
-#Feedback
+# Feedback
 Thank you for your comments.
 
 
